@@ -5,6 +5,16 @@
 #include <unistd.h>
 #include <cstring>
 #include <arpa/inet.h>
+#include <thread>
+#include <vector>
+
+void log(const std::string &message) {
+    std::cout << message << std::endl;
+}
+
+void logError(const std::string &errorMessage) {
+    log("ERROR: " + errorMessage);
+}
 
 Server::Server(const std::string& ip_addr, int port)
     : ip_address(ip_addr), port(port), server_socket(-1) {
@@ -13,12 +23,14 @@ Server::Server(const std::string& ip_addr, int port)
 
 Server::~Server() {
     stopServer();
+    joinThreads();
 }
 
 void Server::startServer() {
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket < 0) {
-        throw std::runtime_error("ERROR: Cannot create socket");
+        logError("Ne mogu kreirati socket");
+        exit(1);
     }
 
     server_addr.sin_family = AF_INET;
@@ -26,21 +38,22 @@ void Server::startServer() {
     server_addr.sin_port = htons(port);
 
     if (bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        throw std::runtime_error("ERROR: Cannot bind socket");
+        logError("Ne mogu povezati socket");
+        exit(1);
     }
 
     if (listen(server_socket, 5) < 0) {
-        throw std::runtime_error("ERROR: Cannot listen on socket");
+        logError("Ne mogu slušati na socketu");
+        exit(1);
     }
 
-    std::cout << "Server started on " << ip_address << ":" << port << std::endl;
+    log("Server pokrenut na " + ip_address + ":" + std::to_string(port));
 }
 
 void Server::stopServer() {
     if (server_socket >= 0) {
         close(server_socket);
     }
-    std::cout << "Server stopped." << std::endl;
 }
 
 void Server::run() {
@@ -50,12 +63,12 @@ void Server::run() {
 
         int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_len);
         if (client_socket < 0) {
-            std::cerr << "ERROR: Failed to accept client connection." << std::endl;
+            logError("Klijent se ne može povezati");
             continue;
         }
 
-        std::cout << "Client connected. Processing request..." << std::endl;
-        handleClient(client_socket);
+        log("Klijent se povezao");
+        threads.emplace_back(&Server::handleClient, this, client_socket);
     }
 }
 
@@ -65,7 +78,7 @@ void Server::handleClient(int client_socket) {
 
     int bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
     if (bytes_received <= 0) {
-        std::cerr << "ERROR: Failed to receive data from client." << std::endl;
+        logError("Nemogućnost prihvaćanja podataka od klijenta");
         close(client_socket);
         return;
     }
@@ -75,15 +88,14 @@ void Server::handleClient(int client_socket) {
 
     send(client_socket, response.c_str(), response.size(), 0);
     close(client_socket);
-    std::cout << "Response sent to client and connection closed." << std::endl;
+    log("Klijent je dobio odgovor");
 }
 
 std::string Server::processRequest(const std::string& request) {
     if (request.find("GET") != std::string::npos) {
-        std::string currentTime = getCurrentTime();
         return "HTTP/1.1 200 OK\r\n"
                "Content-Type: text/html\r\n\r\n"
-               "<!DOCTYPE html><html><body>" + currentTime + "</body></html>";
+               "<!DOCTYPE html><html><body><h1>Hey yo</h1></body></html>";
     }
 
     return "HTTP/1.1 400 Bad Request\r\n"
@@ -91,10 +103,11 @@ std::string Server::processRequest(const std::string& request) {
            "Invalid request.";
 }
 
-std::string Server::getCurrentTime() {
-    time_t now = time(0);
-    tm* ltm = localtime(&now);
-    char buffer[80];
-    strftime(buffer, sizeof(buffer), "%d.%m.%Y %H:%M:%S", ltm);
-    return std::string(buffer);
+void Server::joinThreads() {
+    for (std::thread& t : threads) {
+        if (t.joinable()) {
+            t.join();
+        }
+    }
+    threads.clear();
 }

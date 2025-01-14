@@ -3,6 +3,8 @@
 
 #include <string>
 #include <netinet/in.h>
+#include <thread>
+#include <vector>
 
 class Server {
 public:
@@ -16,12 +18,13 @@ private:
     int port;
     int server_socket;
     struct sockaddr_in server_addr;
+    std::vector<std::thread> threads;
 
     void startServer();
     void stopServer();
     void handleClient(int client_socket);
     std::string processRequest(const std::string& request);
-    std::string getCurrentTime();
+    void joinThreads();
 };
 
 #endif
