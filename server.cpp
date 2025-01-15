@@ -1,6 +1,4 @@
 #include "server.h"
-#include "file.h"
-#include "request.h"
 #include <iostream>
 #include <sstream>
 #include <ctime>
@@ -83,11 +81,11 @@ void Server::run() {
     }
 }
 
-void Server::get(std::string path, std::string(*callback)(std::string)) {
+void Server::get(std::string path, std::string(*callback)(Request*)) {
     handlers["GET"].insert(std::make_pair(path, callback));
 }
 
-void Server::post(std::string path, std::string(*callback)(std::string)) {
+void Server::post(std::string path, std::string(*callback)(Request*)) {
     handlers["POST"].insert(std::make_pair(path, callback));
 }
 
@@ -118,9 +116,9 @@ std::string Server::processRequest(const std::string& request_text) {
     auto handler = handlers.at(request->method);
 
     try {
-        std::string(*callback)(std::string) = handler.at(request->path);
+        std::string(*callback)(Request*) = handler.at(request->path);
 
-        std::string file_text = callback(request->path);
+        std::string file_text = callback(request);
 
         delete request;
         return "HTTP/1.1 200 OK\r\n"

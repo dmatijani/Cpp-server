@@ -1,3 +1,4 @@
+#include "request.h"
 #include <string>
 #include <netinet/in.h>
 #include <thread>
@@ -10,8 +11,8 @@ public:
     ~Server();
 
     void run();
-    void get(std::string path, std::string(*callback)(std::string));
-    void post(std::string path, std::string(*callback)(std::string));
+    void get(std::string path, std::string(*callback)(Request*));
+    void post(std::string path, std::string(*callback)(Request*));
 
 private:
     std::string ip_address;
@@ -19,7 +20,7 @@ private:
     int server_socket;
     struct sockaddr_in server_addr;
     std::vector<std::thread> threads;
-    std::map<std::string, std::map<std::string, std::string(*)(std::string)>> handlers;
+    std::map<std::string, std::map<std::string, std::string(*)(Request*)>> handlers;
 
     void startServer();
     void stopServer();
