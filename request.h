@@ -1,4 +1,6 @@
 #include <string>
+#include <vector>
+#include <map>
 
 class Request {
 public:
@@ -8,4 +10,6 @@ private:
     bool valid;
     std::string method;
     std::string path;
+    std::vector<std::string> accept;
+    std::map<std::string, std::string> params;
 };
