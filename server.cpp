@@ -1,5 +1,6 @@
 #include "server.h"
 #include "file.h"
+#include "request.h"
 #include <iostream>
 #include <sstream>
 #include <ctime>
@@ -9,7 +10,6 @@
 #include <thread>
 #include <vector>
 #include <fstream>
-#include "request.h"
 
 void log(const std::string &message) {
     std::cout << message << std::endl;
@@ -84,7 +84,11 @@ void Server::run() {
 }
 
 void Server::get(std::string path, std::string(*callback)(std::string)) {
-    use_files[path] = callback;
+    handlers["GET"].insert(std::make_pair(path, callback));
+}
+
+void Server::post(std::string path, std::string(*callback)(std::string)) {
+    handlers["POST"].insert(std::make_pair(path, callback));
 }
 
 void Server::handleClient(int client_socket) {
@@ -103,53 +107,32 @@ void Server::handleClient(int client_socket) {
 
     send(client_socket, response.c_str(), response.size(), 0);
     close(client_socket);
-    log("Klijent je dobio odgovor");
 }
 
 std::string Server::processRequest(const std::string& request_text) {
-    //std::cout << request << std::endl;
-    Request* request = new Request(request_text);
-    delete request;
-    if (request_text.find("GET") != std::string::npos) {
-        std::string data = processGetRequest(request_text);
-        return "HTTP/1.1 200 OK\r\n"
-               "Content-Type: text/html\r\n\r\n" + data;
-    }
-
-    return "HTTP/1.1 400 Bad Request\r\n"
-           "Content-Type: text/plain\r\n\r\n"
-           "Invalid request.";
-}
-
-std::string Server::processGetRequest(const std::string& request) {
+    std::string bad_request = "HTTP/1.1 400 Bad Request\r\n"
+                              "Content-Type: text/plain\r\n\r\n"
+                              "Invalid request.";
     std::string not_found = "<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>";
+    Request* request = new Request(request_text);
+    auto handler = handlers.at(request->method);
 
-    size_t start = request.find(" ");
-    if (start == std::string::npos) {
-        return not_found;
-    }
-
-    size_t end = request.find(" ", start + 1);
-    if (end == std::string::npos) {
-        return not_found;
-    }
-
-    std::string path = request.substr(start + 1, end - start - 1);
     try {
-        std::string(*callback)(std::string) = use_files.at(path);
+        std::string(*callback)(std::string) = handler.at(request->path);
 
-        auto it = use_files.find(path);
-        if (it == use_files.end()) {
-            return not_found;
-        }
-        std::string file_text = it->second(path);
+        std::string file_text = callback(request->path);
 
-        return file_text;
+        delete request;
+        return "HTTP/1.1 200 OK\r\n"
+               "Content-Type: text/html\r\n\r\n" + file_text;
     } catch (...) {
-        return not_found;
+        delete request;
+        return "HTTP/1.1 200 OK\r\n"
+               "Content-Type: text/html\r\n\r\n" + not_found;
     }
 
-    return not_found;
+    delete request;
+    return bad_request;
 }
 
 void Server::joinThreads() {
