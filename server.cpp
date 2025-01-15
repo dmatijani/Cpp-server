@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <thread>
 #include <vector>
+#include <fstream>
 
 void log(const std::string &message) {
     std::cout << message << std::endl;
@@ -53,7 +54,9 @@ void Server::startServer() {
 void Server::stopServer() {
     if (server_socket >= 0) {
         close(server_socket);
+        log("Socket zatvoren");
     }
+    log("Server uspješno ugašen");
 }
 
 void Server::run() {
@@ -72,7 +75,13 @@ void Server::run() {
     }
 }
 
+void Server::get(std::string path, std::string file) {
+    use_files[path] = file;
+}
+
 void Server::handleClient(int client_socket) {
+    std::cout << "Broj dretvi: " << threads.size() << std::endl;
+    // TODO: probaj ispisati sve dretve i vidi kako stoje
     char buffer[1024];
     memset(buffer, 0, sizeof(buffer));
 
@@ -92,15 +101,43 @@ void Server::handleClient(int client_socket) {
 }
 
 std::string Server::processRequest(const std::string& request) {
+    std::cout << request << std::endl;
     if (request.find("GET") != std::string::npos) {
+        std::string data = processGetRequest(request);
         return "HTTP/1.1 200 OK\r\n"
-               "Content-Type: text/html\r\n\r\n"
-               "<!DOCTYPE html><html><body><h1>Hey yo</h1></body></html>";
+               "Content-Type: text/html\r\n\r\n" + data;
     }
 
     return "HTTP/1.1 400 Bad Request\r\n"
            "Content-Type: text/plain\r\n\r\n"
            "Invalid request.";
+}
+
+std::string Server::processGetRequest(const std::string& request) {
+    std::string notFound = "<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>";
+
+    size_t start = request.find(" ");
+    if (start == std::string::npos) {
+        return notFound;
+    }
+
+    size_t end = request.find(" ", start + 1);
+    if (end == std::string::npos) {
+        return notFound;
+    }
+
+    std::string path = request.substr(start + 1, end - start - 1);
+    try {
+        std::string file_path = use_files.at(path);
+        std::fstream file(file_path);
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        return buffer.str();
+    } catch (...) {
+        return notFound;
+    }
+
+    return notFound;
 }
 
 void Server::joinThreads() {

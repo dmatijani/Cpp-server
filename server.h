@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <thread>
 #include <vector>
+#include <map>
 
 class Server {
 public:
@@ -12,6 +13,7 @@ public:
     ~Server();
 
     void run();
+    void get(std::string path, std::string file);
 
 private:
     std::string ip_address;
@@ -19,11 +21,13 @@ private:
     int server_socket;
     struct sockaddr_in server_addr;
     std::vector<std::thread> threads;
+    std::map<std::string, std::string> use_files;
 
     void startServer();
     void stopServer();
     void handleClient(int client_socket);
     std::string processRequest(const std::string& request);
+    std::string processGetRequest(const std::string& request);
     void joinThreads();
 };
 
