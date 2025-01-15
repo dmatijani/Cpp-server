@@ -9,6 +9,8 @@ public:
     std::string text();
     static Response* ok();
     static Response* bad_request();
+    static std::string not_found_text();
+    static std::string bad_request_text();
 private:
     int status_code;
     std::string content_type;

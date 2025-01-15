@@ -113,7 +113,11 @@ std::string Server::processRequest(const std::string& request_text) {
                               "Invalid request.";
     Request* request = new Request(request_text);
     Response* response = new Response();
-    auto handler = handlers.at(request->method);
+    auto handler_iter = handlers.find(request->method);
+    if (handler_iter == handlers.end()) {
+        return Response::bad_request_text();
+    }
+    auto handler = handler_iter->second;
 
     try {
         std::string(*callback)(Request*) = handler.at(request->path);
@@ -125,16 +129,13 @@ std::string Server::processRequest(const std::string& request_text) {
         delete response;
         return response_text;
     } catch (...) {
-        delete response;
-        Response* not_found_response = Response::ok()->set_data("<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>");
-        std::string not_found_response_text = not_found_response->text();
-        delete not_found_response;
         delete request;
-        return not_found_response_text;
+        delete response;
+        return Response::not_found_text();
     }
 
     delete request;
-    return bad_request;
+    return Response::bad_request_text();
 }
 
 void Server::joinThreads() {

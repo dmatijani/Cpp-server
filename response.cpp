@@ -30,7 +30,6 @@ std::string Response::text() {
     stream << "Content-Type: " << this->content_type;
     stream << "\r\n\r\n";
     stream << this->data;
-    std::cout << stream.str() << std::endl;
     return stream.str();
 }
 
@@ -63,4 +62,20 @@ std::string Response::get_status_code_text() {
         default:
         return "";
     }
+}
+
+std::string Response::not_found_text() {
+    Response* not_found_response = Response::ok();
+    not_found_response->set_content_type("text/html");
+    not_found_response->set_data("<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>");
+    std::string not_found_text = not_found_response->text();
+    delete not_found_response;
+    return not_found_text;
+}
+
+std::string Response::bad_request_text() {
+    Response* bad_request_response = Response::bad_request();
+    std::string bad_request_text = bad_request_response->text();
+    delete bad_request_response;
+    return bad_request_text;
 }
