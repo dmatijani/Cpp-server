@@ -9,6 +9,7 @@
 #include <thread>
 #include <vector>
 #include <fstream>
+#include "request.h"
 
 void log(const std::string &message) {
     std::cout << message << std::endl;
@@ -105,10 +106,12 @@ void Server::handleClient(int client_socket) {
     log("Klijent je dobio odgovor");
 }
 
-std::string Server::processRequest(const std::string& request) {
-    std::cout << request << std::endl;
-    if (request.find("GET") != std::string::npos) {
-        std::string data = processGetRequest(request);
+std::string Server::processRequest(const std::string& request_text) {
+    //std::cout << request << std::endl;
+    Request* request = new Request(request_text);
+    delete request;
+    if (request_text.find("GET") != std::string::npos) {
+        std::string data = processGetRequest(request_text);
         return "HTTP/1.1 200 OK\r\n"
                "Content-Type: text/html\r\n\r\n" + data;
     }
