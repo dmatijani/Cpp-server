@@ -10,17 +10,6 @@ void end (int sig) {
     exit(sig);
 }
 
-std::string get_page(std::string path) {
-    File *file = new File();
-    if (path == "") {
-        path = "index";
-    }
-    std::string new_path = "./client" + path + ".html";
-    std::string file_text = file->fileFromPath(new_path);
-    delete file;
-    return file_text;
-}
-
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         std::cout << "Nije unesen argument za port!" << std::endl;
@@ -39,6 +28,20 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, end);
 
     server = new Server("127.0.0.1", port);
+
+    server->get("/js", [](Request* req, Response* res) {
+        File *file = new File();
+        std::string file_text = file->fileFromPath("./client/js/app.js");
+        delete file;
+        res->set_content_type("application/javascript")->set_status(200)->set_data(file_text);
+    });
+    server->get("/css", [](Request* req, Response* res) {
+        File *file = new File();
+        std::string file_text = file->fileFromPath("./client/styles/style.css");
+        delete file;
+        res->set_content_type("text/css")->set_status(200)->set_data(file_text);
+    });
+
     server->get("/", [](Request* req, Response* res) {
         File *file = new File();
         std::string file_text = file->fileFromPath("./client/index.html");
