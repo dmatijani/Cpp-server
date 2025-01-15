@@ -34,6 +34,12 @@ void Server::startServer() {
         exit(1);
     }
 
+    int opt = 1;
+    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        logError("Ne mogu postaviti opciju SO_REUSEADDR");
+        exit(1);
+    }
+
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = inet_addr(ip_address.c_str());
     server_addr.sin_port = htons(port);
