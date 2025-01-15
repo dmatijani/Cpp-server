@@ -2,5 +2,5 @@
 
 class File {
 public:
-    std::string fileFromPath(std::string path);
+    static std::string fileFromPath(std::string path);
 };

@@ -1,5 +1,6 @@
 #include "server.h"
 #include "file.h"
+#include "html.h"
 #include <csignal>
 #include <iostream>
 
@@ -30,29 +31,30 @@ int main(int argc, char *argv[]) {
     server = new Server("127.0.0.1", port);
 
     server->get("/js", [](Request* req, Response* res) {
-        File *file = new File();
-        std::string file_text = file->fileFromPath("./client/js/app.js");
-        delete file;
+        std::string file_text = File::fileFromPath("./client/js/app.js");
         res->set_content_type("application/javascript")->set_status(200)->set_data(file_text);
     });
     server->get("/css", [](Request* req, Response* res) {
-        File *file = new File();
-        std::string file_text = file->fileFromPath("./client/styles/style.css");
-        delete file;
+        std::string file_text = File::fileFromPath("./client/styles/style.css");
         res->set_content_type("text/css")->set_status(200)->set_data(file_text);
     });
 
     server->get("/", [](Request* req, Response* res) {
-        File *file = new File();
-        std::string file_text = file->fileFromPath("./client/index.html");
-        delete file;
-        res->set_content_type("text/html")->set_status(200)->set_data(file_text);
+        std::string template_text = File::fileFromPath("./client/template.html");
+        std::string homepage_text = File::fileFromPath("./client/index.html");
+        homepage_text += "<p>Ovo je početna stranica!</p>";
+        Html* html = new Html(template_text);
+        html->set_title("Početna")->set_content(homepage_text);
+        res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
+        delete html;
     });
     server->get("/autor", [](Request* req, Response* res) {
-        File *file = new File();
-        std::string file_text = file->fileFromPath("./client/autor.html");
-        delete file;
-        res->set_content_type("text/html")->set_status(200)->set_data(file_text);
+        std::string template_text = File::fileFromPath("./client/template.html");
+        std::string author_text = File::fileFromPath("./client/autor.html");
+        Html* html = new Html(template_text);
+        html->set_title("O autoru")->set_content(author_text);
+        res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
+        delete html;
     });
     server->run();
 

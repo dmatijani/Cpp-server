@@ -4,4 +4,32 @@
 
 h1 {
     font-size: 4em;
+    margin: 0px;
+}
+
+h2 {
+    font-size: 2.5em;
+}
+
+body {
+    margin: 0px;
+}
+
+nav, main {
+    margin: 20px;
+}
+
+header, footer {
+    text-align: center;
+    background-color: gray;
+    padding: 20px 0px;
+    color: white;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
 }
