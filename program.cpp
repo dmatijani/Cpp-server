@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     }
     std::cout << port << std::endl;
 
-    sigset(SIGINT, end);
+    signal(SIGINT, end);
 
     server = new Server("127.0.0.1", port);
     server->get("/", "./client/index.html");

@@ -1,6 +1,3 @@
-#ifndef SERVER_H
-#define SERVER_H
-
 #include <string>
 #include <netinet/in.h>
 #include <thread>
@@ -30,5 +27,3 @@ private:
     std::string processGetRequest(const std::string& request);
     void joinThreads();
 };
-
-#endif

@@ -86,8 +86,6 @@ void Server::get(std::string path, std::string file) {
 }
 
 void Server::handleClient(int client_socket) {
-    std::cout << "Broj dretvi: " << threads.size() << std::endl;
-    // TODO: probaj ispisati sve dretve i vidi kako stoje
     char buffer[1024];
     memset(buffer, 0, sizeof(buffer));
 
@@ -150,6 +148,9 @@ void Server::joinThreads() {
     for (std::thread& t : threads) {
         if (t.joinable()) {
             t.join();
+            log("Dretva je joinana");
+        } else {
+            log("Dretva se ne može joinati");
         }
     }
     threads.clear();
