@@ -81,11 +81,11 @@ void Server::run() {
     }
 }
 
-void Server::get(std::string path, std::string(*callback)(Request*, Response*)) {
+void Server::get(std::string path, void(*callback)(Request*, Response*)) {
     handlers["GET"].insert(std::make_pair(path, callback));
 }
 
-void Server::post(std::string path, std::string(*callback)(Request*, Response*)) {
+void Server::post(std::string path, void(*callback)(Request*, Response*)) {
     handlers["POST"].insert(std::make_pair(path, callback));
 }
 
@@ -124,9 +124,8 @@ std::string Server::processRequest(const std::string& request_text) {
     auto handler = handler_iter->second;
 
     try {
-        std::string(*callback)(Request*, Response*) = handler.at(request->path);
-
-        std::string file_text = callback(request, response);
+        void(*callback)(Request*, Response*) = handler.at(request->path);
+        callback(request, response);
 
         std::string response_text = response->text();
         delete request;

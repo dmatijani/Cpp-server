@@ -12,8 +12,8 @@ public:
     ~Server();
 
     void run();
-    void get(std::string path, std::string(*callback)(Request*, Response*));
-    void post(std::string path, std::string(*callback)(Request*, Response*));
+    void get(std::string path, void(*callback)(Request*, Response*));
+    void post(std::string path, void(*callback)(Request*, Response*));
 
 private:
     std::string ip_address;
@@ -21,7 +21,7 @@ private:
     int server_socket;
     struct sockaddr_in server_addr;
     std::vector<std::thread> threads;
-    std::map<std::string, std::map<std::string, std::string(*)(Request*, Response*)>> handlers;
+    std::map<std::string, std::map<std::string, void(*)(Request*, Response*)>> handlers;
 
     void startServer();
     void stopServer();

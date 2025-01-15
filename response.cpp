@@ -67,7 +67,15 @@ std::string Response::get_status_code_text() {
 std::string Response::not_found_text() {
     Response* not_found_response = Response::ok();
     not_found_response->set_content_type("text/html");
-    not_found_response->set_data("<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>");
+    not_found_response->set_status(404);
+    not_found_response->set_data(
+        "<!DOCTYPE html><html lang='en'>"
+        "<head><meta charset='UTF-8'></head><body>"
+        "<h1>404</h1>"
+        "<p>Nije pronađena stranica koju tražite.</p>"
+        "<a href='/'>Početna</a>"
+        "</body></html>"
+    );
     std::string not_found_text = not_found_response->text();
     delete not_found_response;
     return not_found_text;
