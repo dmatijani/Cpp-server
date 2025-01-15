@@ -39,16 +39,18 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, end);
 
     server = new Server("127.0.0.1", port);
-    server->get("/", [](Request* request) -> std::string {
+    server->get("/", [](Request* req, Response* res) -> std::string {
         File *file = new File();
         std::string file_text = file->fileFromPath("./client/index.html");
         delete file;
+        res->set_content_type("text/html")->set_status(200)->set_data(file_text);
         return file_text;
     });
-    server->get("/autor", [](Request* request) -> std::string {
+    server->get("/autor", [](Request* req, Response* res) -> std::string {
         File *file = new File();
         std::string file_text = file->fileFromPath("./client/autor.html");
         delete file;
+        res->set_content_type("text/html")->set_status(200)->set_data(file_text);
         return file_text;
     });
     server->run();

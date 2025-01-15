@@ -81,11 +81,11 @@ void Server::run() {
     }
 }
 
-void Server::get(std::string path, std::string(*callback)(Request*)) {
+void Server::get(std::string path, std::string(*callback)(Request*, Response*)) {
     handlers["GET"].insert(std::make_pair(path, callback));
 }
 
-void Server::post(std::string path, std::string(*callback)(Request*)) {
+void Server::post(std::string path, std::string(*callback)(Request*, Response*)) {
     handlers["POST"].insert(std::make_pair(path, callback));
 }
 
@@ -112,6 +112,10 @@ std::string Server::processRequest(const std::string& request_text) {
                               "Content-Type: text/plain\r\n\r\n"
                               "Invalid request.";
     Request* request = new Request(request_text);
+    if (!request->is_valid()) {
+        delete request;
+        return Response::bad_request_text();
+    }
     Response* response = new Response();
     auto handler_iter = handlers.find(request->method);
     if (handler_iter == handlers.end()) {
@@ -120,9 +124,9 @@ std::string Server::processRequest(const std::string& request_text) {
     auto handler = handler_iter->second;
 
     try {
-        std::string(*callback)(Request*) = handler.at(request->path);
+        std::string(*callback)(Request*, Response*) = handler.at(request->path);
 
-        std::string file_text = callback(request);
+        std::string file_text = callback(request, response);
 
         std::string response_text = response->text();
         delete request;

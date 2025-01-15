@@ -8,13 +8,15 @@ Request::Request(const std::string& request_text) {
     this->valid = true;
 
     size_t start = request_text.find(" ");
-    if (start != std::string::npos) {
+    if (start == std::string::npos) {
         this->valid = false;
+        return;
     }
     
     size_t end = request_text.find(" ", start + 1);
-    if (end != std::string::npos) {
+    if (end == std::string::npos) {
         this->valid = false;
+        return;
     }
 
     this->method = request_text.substr(0, start);
