@@ -56,6 +56,22 @@ int main(int argc, char *argv[]) {
         res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
         delete html;
     });
+    server->get("/objavi", [](Request* req, Response* res) {
+        std::string template_text = File::fileFromPath("./client/template.html");
+        std::string post_text = File::fileFromPath("./client/objavi.html");
+        Html* html = new Html(template_text);
+        html->set_title("Nova objava")->set_content(post_text);
+        res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
+        delete html;
+    });
+    server->post("/novaObjava", [](Request* req, Response* res) {
+        std::string template_text = File::fileFromPath("./client/template.html");
+        std::string post_text = "<p>Poslao si formu uspješno!</p>";
+        Html* html = new Html(template_text);
+        html->set_title("Nova objava")->set_content(post_text);
+        res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
+        delete html;
+    });
     server->run();
 
     end(0);
