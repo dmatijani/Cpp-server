@@ -1,4 +1,5 @@
 #include "server.h"
+#include "file.h"
 #include <iostream>
 #include <sstream>
 #include <ctime>
@@ -81,8 +82,8 @@ void Server::run() {
     }
 }
 
-void Server::get(std::string path, std::string file) {
-    use_files[path] = file;
+void Server::get(std::string path, std::string(*callback)(std::string)) {
+    use_files[path] = callback;
 }
 
 void Server::handleClient(int client_socket) {
@@ -118,30 +119,34 @@ std::string Server::processRequest(const std::string& request) {
 }
 
 std::string Server::processGetRequest(const std::string& request) {
-    std::string notFound = "<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>";
+    std::string not_found = "<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>";
 
     size_t start = request.find(" ");
     if (start == std::string::npos) {
-        return notFound;
+        return not_found;
     }
 
     size_t end = request.find(" ", start + 1);
     if (end == std::string::npos) {
-        return notFound;
+        return not_found;
     }
 
     std::string path = request.substr(start + 1, end - start - 1);
     try {
-        std::string file_path = use_files.at(path);
-        std::fstream file(file_path);
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        return buffer.str();
+        std::string(*callback)(std::string) = use_files.at(path);
+
+        auto it = use_files.find(path);
+        if (it == use_files.end()) {
+            return not_found;
+        }
+        std::string file_text = it->second(path);
+
+        return file_text;
     } catch (...) {
-        return notFound;
+        return not_found;
     }
 
-    return notFound;
+    return not_found;
 }
 
 void Server::joinThreads() {

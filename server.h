@@ -10,7 +10,7 @@ public:
     ~Server();
 
     void run();
-    void get(std::string path, std::string file);
+    void get(std::string path, std::string(*callback)(std::string));
 
 private:
     std::string ip_address;
@@ -18,7 +18,7 @@ private:
     int server_socket;
     struct sockaddr_in server_addr;
     std::vector<std::thread> threads;
-    std::map<std::string, std::string> use_files;
+    std::map<std::string, std::string(*)(std::string)> use_files;
 
     void startServer();
     void stopServer();
