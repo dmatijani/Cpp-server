@@ -111,8 +111,8 @@ std::string Server::processRequest(const std::string& request_text) {
     std::string bad_request = "HTTP/1.1 400 Bad Request\r\n"
                               "Content-Type: text/plain\r\n\r\n"
                               "Invalid request.";
-    std::string not_found = "<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>";
     Request* request = new Request(request_text);
+    Response* response = new Response();
     auto handler = handlers.at(request->method);
 
     try {
@@ -120,13 +120,17 @@ std::string Server::processRequest(const std::string& request_text) {
 
         std::string file_text = callback(request);
 
+        std::string response_text = response->text();
         delete request;
-        return "HTTP/1.1 200 OK\r\n"
-               "Content-Type: text/html\r\n\r\n" + file_text;
+        delete response;
+        return response_text;
     } catch (...) {
+        delete response;
+        Response* not_found_response = Response::ok()->set_data("<!DOCTYPE html><html lang='en'><p>Nije pronadena stranica koju trazite.</p></html>");
+        std::string not_found_response_text = not_found_response->text();
+        delete not_found_response;
         delete request;
-        return "HTTP/1.1 200 OK\r\n"
-               "Content-Type: text/html\r\n\r\n" + not_found;
+        return not_found_response_text;
     }
 
     delete request;

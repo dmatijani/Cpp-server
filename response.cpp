@@ -1,5 +1,6 @@
 #include "response.h"
 #include <sstream>
+#include <iostream>
 
 Response::Response() {
     this->status_code = 200;
@@ -29,18 +30,19 @@ std::string Response::text() {
     stream << "Content-Type: " << this->content_type;
     stream << "\r\n\r\n";
     stream << this->data;
+    std::cout << stream.str() << std::endl;
     return stream.str();
 }
 
 Response* Response::ok() {
     Response* response = new Response();
-    response->set_status(200);
+    response->set_status(200)->set_content_type("text/html");
     return response;
 }
 
 Response* Response::bad_request() {
     Response* response = new Response();
-    response->set_status(400)->set_content_type("text/plain")->set_data("Invalid request.");
+    response->set_status(400)->set_content_type("text/html")->set_data("Invalid request.");
     return response;
 }
 
