@@ -19,6 +19,10 @@ nav, main {
     margin: 20px;
 }
 
+main {
+    margin-bottom: 120px;
+}
+
 header, footer {
     text-align: center;
     background-color: gray;

@@ -16,9 +16,9 @@ void get_time(char out[30])
     tm *ltm = localtime(&sad);
     char buffer[80];
     strftime(buffer, sizeof(buffer), "%d.%m.%Y %H:%M:%S", ltm);
-    std::string uuid_str = std::string(buffer);
+    std::string time_str = std::string(buffer);
     for (int i = 0; i < 30; i++) {
-        out[i] = uuid_str[i];
+        out[i] = time_str[i];
     }
 }
 
@@ -39,9 +39,10 @@ void generate_uuid(char out[36]) {
     ss << std::setw(12) << std::setfill('0') << dis(gen) << dis(gen) << dis(gen) << dis(gen);
 
     std::string uuid_str = ss.str();
-    for (int i = 0; i < 36; i++) {
+    for (int i = 0; i < 35; i++) {
         out[i] = uuid_str[i];
     }
+    out[35] = '\0';
 }
 
 void NewPostHandler::handle_new_post(Request* req, Response* res) {
