@@ -3,6 +3,7 @@
 #include "server/server.h"
 #include "handlers/new_post_handler.h"
 #include "handlers/get_posts_handler.h"
+#include "handlers/get_post_details_handler.h"
 #include "handlers/new_comment_handler.h"
 #include <csignal>
 #include <iostream>
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
     });
 
     server->get("/", GetPostsHandler::handle_get_posts);
-    server->get("/objava", GetPostsHandler::handle_get_post_details);
+    server->get("/objava", GetPostDetailsHandler::handle_get_post_details);
     server->get("/autor", [](Request* req, Response* res) {
         std::string template_text = File::fileFromPath("./client/template.html");
         std::string author_text = File::fileFromPath("./client/autor.html");
