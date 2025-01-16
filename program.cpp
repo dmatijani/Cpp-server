@@ -24,7 +24,6 @@ int main(int argc, char *argv[]) {
         std::cout << "Neispravan port!" << std::endl;
         exit(1);
     }
-    std::cout << port << std::endl;
 
     signal(SIGINT, end);
 
@@ -74,6 +73,7 @@ int main(int argc, char *argv[]) {
         res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
         delete html;
     });
+    
     server->run();
 
     end(0);
