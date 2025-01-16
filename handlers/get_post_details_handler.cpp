@@ -2,6 +2,24 @@
 #include "../file.h"
 #include "../html.h"
 #include "../data/objava.h"
+#include "../data/komentar.h"
+#include <vector>
+
+std::string get_comments(std::string post_id) {
+    std::string comments_html = "";
+    std::vector<Komentar> comments = File::read_from_binary_file<Komentar>("./data/" + post_id + ".bin");
+    for (auto & comment : comments) {
+        std::string komentar_template = File::fileFromPath("./client/components/komentar.html");
+        Html* comment_html = new Html(komentar_template);
+        comment_html->set_placeholder("komentar", std::string(comment.komentar));
+        comment_html->set_placeholder("vrijeme", std::string(comment.vrijeme));
+        comment_html->set_placeholder("autor", std::string(comment.autor));
+        comments_html += comment_html->get_html();
+        delete comment_html;
+    }
+
+    return comments_html;
+}
 
 std::string get_post(std::string uuid) {
     Objava post;
@@ -37,6 +55,7 @@ void GetPostDetailsHandler::handle_get_post_details(Request* req, Response* res)
     std::string template_text = File::fileFromPath("./client/template.html");
     Html* html = new Html(template_text);
     html->set_title("Objava")->set_content(get_post(id));
+    html->set_placeholder("komentari", get_comments(id));
     res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
     delete html;
 }
