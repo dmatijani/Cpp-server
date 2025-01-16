@@ -5,9 +5,13 @@
 #include <vector>
 #include <iostream>
 
-std::string add_posts() {
+#ifndef PAGE_SIZE
+#define PAGE_SIZE 10
+#endif
+
+std::string add_posts(int page) {
     std::string posts_html = "";
-    std::vector<Objava> posts = File::read_from_binary_file<Objava>("./data/objave.bin");
+    std::vector<Objava> posts = File::read_from_binary_file<Objava>("./data/objave.bin", page*PAGE_SIZE, PAGE_SIZE);
     for (auto & post : posts) {
         posts_html += "<div>"
                       "<h3>" + std::string(post.naslov) + "</h3>"
@@ -20,13 +24,22 @@ std::string add_posts() {
 }
 
 std::string add_arrows() {
-    return "<p>Ovdje će biti strjelice!</p>";
+    return "<button id='prevPageButton'><</button><span id='pageCount'></span><button id='nextPageButton'>></button>";
 }
 
 void GetPostsHandler::handle_get_posts(Request* req, Response* res) {
+    int page = 0;
+    if (req->params.find("page") != req->params.end()) {
+        try {
+            page = stoi(req->params["page"]);
+        } catch (...) {
+            page = 0;
+        }
+    }
+
     std::string template_text = File::fileFromPath("./client/template.html");
     std::string homepage_text = File::fileFromPath("./client/index.html");
-    homepage_text += add_posts();
+    homepage_text += add_posts(page);
     homepage_text += add_arrows();
     Html* html = new Html(template_text);
     html->set_title("Početna")->set_content(homepage_text);
