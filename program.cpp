@@ -35,28 +35,33 @@ int main(int argc, char *argv[]) {
 
     server->get("/js", [](Request* req, Response* res) {
         req->no_print();
-        std::string file_text = File::fileFromPath("./client/js/app.js");
+        std::string file_text = File::file_from_path("./client/js/app.js");
         res->set_content_type("application/javascript")->set_status(200)->no_print()->set_data(file_text);
     });
     server->get("/css", [](Request* req, Response* res) {
         req->no_print();
-        std::string file_text = File::fileFromPath("./client/styles/style.css");
+        std::string file_text = File::file_from_path("./client/styles/style.css");
         res->set_content_type("text/css")->set_status(200)->no_print()->set_data(file_text);
+    });
+    server->get("/autorSlika", [](Request* req, Response* res) {
+        std::string file_data = File::file_from_path("./client/assets/autor.jpeg");
+        std::cout << "AUTOR: " << file_data << std::endl;
+        res->set_content_type("image/jpeg")->set_status(200)->set_data(file_data);
     });
 
     server->get("/", GetPostsHandler::handle_get_posts);
     server->get("/objava", GetPostDetailsHandler::handle_get_post_details);
     server->get("/autor", [](Request* req, Response* res) {
-        std::string template_text = File::fileFromPath("./client/template.html");
-        std::string author_text = File::fileFromPath("./client/autor.html");
+        std::string template_text = File::file_from_path("./client/template.html");
+        std::string author_text = File::file_from_path("./client/autor.html");
         Html* html = new Html(template_text);
         html->set_title("O autoru")->set_content(author_text);
         res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
         delete html;
     });
     server->get("/objavi", [](Request* req, Response* res) {
-        std::string template_text = File::fileFromPath("./client/template.html");
-        std::string post_text = File::fileFromPath("./client/objavi.html");
+        std::string template_text = File::file_from_path("./client/template.html");
+        std::string post_text = File::file_from_path("./client/objavi.html");
         Html* html = new Html(template_text);
         html->set_title("Nova objava")->set_content(post_text);
         res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());

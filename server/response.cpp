@@ -40,6 +40,8 @@ std::string Response::text() {
     stream << "\r\n";
     stream << "Content-Type: " << this->content_type;
     stream << "\r\n";
+    stream << "Content-Length: " << this->data.size();
+    stream << "\r\n";
     if (this->cache_control != "") {
         stream << "Cache-Control: " << this->content_type;
         stream << "\r\n";
@@ -82,6 +84,8 @@ std::string Response::get_status_code_text() {
             return "Forbidden";
         case 404:
             return "Not Found";
+        case 415:
+            return "Unsupported Media Type";
         default:
         return "";
     }

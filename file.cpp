@@ -1,9 +1,10 @@
 #include "file.h"
 #include <sstream>
+#include <iostream>
 
 std::mutex File::write_mutex;
 
-std::string File::fileFromPath(std::string path) {
+std::string File::file_from_path(std::string path) {
     try {
         std::fstream file(path);
         std::stringstream buffer;

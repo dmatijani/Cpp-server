@@ -8,7 +8,7 @@
 
 class File {
 public:
-    static std::string fileFromPath(std::string path);
+    static std::string file_from_path(std::string path);
     template <typename T>
     static void write_to_binary_file(const std::string& path, const T& data);
 

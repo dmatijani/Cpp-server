@@ -77,8 +77,8 @@ void NewPostHandler::handle_new_post(Request* req, Response* res) {
 
     File::write_to_binary_file("./data/objave.bin", objava);
 
-    std::string template_text = File::fileFromPath("./client/template.html");
-    std::string new_post_text = File::fileFromPath("./client/nova_objava.html");
+    std::string template_text = File::file_from_path("./client/template.html");
+    std::string new_post_text = File::file_from_path("./client/nova_objava.html");
     Html* html = new Html(template_text);
     html->set_title("Prebacujem...")->set_content(new_post_text);
     res->set_status(201)->set_data(html->get_html());

@@ -9,7 +9,7 @@ std::string get_comments(std::string post_id) {
     std::string comments_html = "";
     std::vector<Komentar> comments = File::read_from_binary_file<Komentar>("./data/" + post_id + ".bin");
     for (auto & comment : comments) {
-        std::string komentar_template = File::fileFromPath("./client/components/komentar.html");
+        std::string komentar_template = File::file_from_path("./client/components/komentar.html");
         Html* comment_html = new Html(komentar_template);
         comment_html->set_placeholder("komentar", std::string(comment.komentar));
         comment_html->set_placeholder("vrijeme", std::string(comment.vrijeme));
@@ -27,7 +27,7 @@ std::string get_post(std::string uuid) {
     std::vector<Objava> posts = File::read_from_binary_file<Objava>("./data/objave.bin");
     for (auto & post : posts) {
         if (post.uuid == uuid) {
-            std::string objava_template = File::fileFromPath("./client/detalji_objave.html");
+            std::string objava_template = File::file_from_path("./client/detalji_objave.html");
             Html* post_html = new Html(objava_template);
             post_html->set_placeholder("naslov", std::string(post.naslov));
             post_html->set_placeholder("vrijeme", std::string(post.vrijeme));
@@ -52,7 +52,7 @@ void GetPostDetailsHandler::handle_get_post_details(Request* req, Response* res)
 
     id = req->params["id"];
 
-    std::string template_text = File::fileFromPath("./client/template.html");
+    std::string template_text = File::file_from_path("./client/template.html");
     Html* html = new Html(template_text);
     html->set_title("Objava")->set_content(get_post(id));
     html->set_placeholder("komentari", get_comments(id));

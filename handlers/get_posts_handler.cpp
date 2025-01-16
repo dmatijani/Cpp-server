@@ -13,7 +13,7 @@ std::string get_posts(int page_number) {
     std::string posts_html = "";
     std::vector<Objava> posts = File::read_from_binary_file<Objava>("./data/objave.bin", page_number*PAGE_SIZE, PAGE_SIZE);
     for (auto & post : posts) {
-        std::string objava_template = File::fileFromPath("./client/components/objava.html");
+        std::string objava_template = File::file_from_path("./client/components/objava.html");
         Html* post_html = new Html(objava_template);
         post_html->set_placeholder("naslov", std::string(post.naslov));
         post_html->set_placeholder("vrijeme", std::string(post.vrijeme));
@@ -27,7 +27,7 @@ std::string get_posts(int page_number) {
 }
 
 std::string get_arrows() {
-    return File::fileFromPath("./client/components/strelice.html");
+    return File::file_from_path("./client/components/strelice.html");
 }
 
 void GetPostsHandler::handle_get_posts(Request* req, Response* res) {
@@ -40,8 +40,8 @@ void GetPostsHandler::handle_get_posts(Request* req, Response* res) {
         }
     }
 
-    std::string template_text = File::fileFromPath("./client/template.html");
-    std::string homepage_text = File::fileFromPath("./client/index.html");
+    std::string template_text = File::file_from_path("./client/template.html");
+    std::string homepage_text = File::file_from_path("./client/index.html");
     Html* html = new Html(template_text);
     html->set_title("Početna")->set_content(homepage_text);
     html->set_placeholder("posts", get_posts(page_number));
