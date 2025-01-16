@@ -6,6 +6,7 @@ Response::Response() {
     this->status_code = 200;
     this->content_type = "text/plain";
     this->data = "";
+    this->allow_print = true;
 }
 
 Response* Response::set_status(int status) {
@@ -23,13 +24,35 @@ Response* Response::set_data(std::string data) {
     return this;
 }
 
+Response* Response::set_cache_control(std::string cache_control) {
+    this->cache_control = cache_control;
+    return this;
+}
+
+Response* Response::set_expires(std::string expires) {
+    this->expires = expires;
+    return this;
+}
+
 std::string Response::text() {
     std::stringstream stream;
     stream << "HTTP/1.1 " << this->status_code << " " << this->get_status_code_text();
     stream << "\r\n";
     stream << "Content-Type: " << this->content_type;
-    stream << "\r\n\r\n";
+    stream << "\r\n";
+    if (this->cache_control != "") {
+        stream << "Cache-Control: " << this->content_type;
+        stream << "\r\n";
+    }
+    if (this->expires != "") {
+        stream << "Expires: " << this->content_type;
+        stream << "\r\n";
+    }
+    stream << "\r\n";
     stream << this->data;
+
+    this->print();
+
     return stream.str();
 }
 
@@ -86,4 +109,18 @@ std::string Response::bad_request_text() {
     std::string bad_request_text = bad_request_response->text();
     delete bad_request_response;
     return bad_request_text;
+}
+
+void Response::print() {
+    if (!this->allow_print) {
+        return;
+    }
+
+    std::cout << "POSLAN ODGOVOR: " << this->status_code << " " << this->get_status_code_text() << std::endl;
+    std::cout << "==============================" << std::endl;
+}
+
+Response* Response::no_print() {
+    this->allow_print = false;
+    return this;
 }

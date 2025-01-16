@@ -96,7 +96,6 @@ void Server::handleClient(int client_socket, std::string client_ip) {
 
     int bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
     if (bytes_received <= 0) {
-        logError("Nemogućnost prihvaćanja podataka od klijenta");
         close(client_socket);
         return;
     }
@@ -111,12 +110,14 @@ void Server::handleClient(int client_socket, std::string client_ip) {
 std::string Server::processRequest(const std::string& request_text, std::string client_ip) {
     Request* request = new Request(request_text, client_ip);
     if (!request->is_valid()) {
+        request->print();
         delete request;
         return Response::bad_request_text();
     }
     Response* response = new Response();
     auto handler_iter = handlers.find(request->method);
     if (handler_iter == handlers.end()) {
+        request->print();
         return Response::bad_request_text();
     }
     auto handler = handler_iter->second;
@@ -124,12 +125,14 @@ std::string Server::processRequest(const std::string& request_text, std::string 
     try {
         void(*callback)(Request*, Response*) = handler.at(request->path);
         callback(request, response);
+        request->print();
 
         std::string response_text = response->text();
         delete request;
         delete response;
         return response_text;
     } catch (...) {
+        request->print();
         delete request;
         delete response;
         return Response::not_found_text();

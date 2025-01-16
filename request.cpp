@@ -1,9 +1,13 @@
 #include "request.h"
 #include <iostream>
 #include <sstream>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 
 Request::Request(const std::string& request_text, std::string ip) {
     this->valid = true;
+    this->allow_print = true;
 
     this->content_type = "";
     this->request_time = get_time();
@@ -80,11 +84,15 @@ Request::Request(const std::string& request_text, std::string ip) {
             }
         }
     }
-
-    this->print();
 }
 
 void Request::print() {
+    if (!this->allow_print) {
+        return;
+    }
+
+    std::cout << std::endl;
+
     std::cout << "(" << this->request_time << ") " << "ZAHTJEV DOŠAO SA: " << this->client_ip << std::endl;
     std::cout << "(" << this->request_time << ") " <<  "METHOD: " << this->method << std::endl;
     std::cout << "(" << this->request_time << ") " <<  "PATH: " << this->path << std::endl;
@@ -94,7 +102,7 @@ void Request::print() {
     if (!this->accept.empty()) {
         std::cout << "(" << this->request_time << ") " <<  "ACCEPT: ";
         for (const auto& mime : this->accept) {
-            std::cout << mime << " ";
+            std::cout << mime << ", ";
         }
         std::cout << std::endl;
     }
@@ -102,28 +110,28 @@ void Request::print() {
     if (!this->params.empty()) {
         std::cout << "(" << this->request_time << ") " <<  "PARAMS:" << std::endl;
         for (const auto& [key, value] : this->params) {
-            std::cout << "  " << key << ": " << value << std::endl;
+            std::cout << " - " << key << ": " << value << std::endl;
         }
     }
 
     if (!this->form_data.empty()) {
         std::cout << "(" << this->request_time << ") " <<  "FORM DATA:" << std::endl;
         for (const auto& [key, value] : this->form_data) {
-            std::cout << " -" << key << ": " << value << std::endl;
+            std::cout << " - " << key << ": " << value << std::endl;
         }
     }
 
     std::cout << "------------------------------" << std::endl;
 }
 
+Request* Request::no_print() {
+    this->allow_print = false;
+    return this;
+}
 
 bool Request::is_valid() {
     return this->valid;
 }
-
-#include <chrono>
-#include <iomanip>
-#include <sstream>
 
 std::string Request::get_time() {
     auto now = std::chrono::system_clock::now();

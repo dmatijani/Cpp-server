@@ -16,9 +16,11 @@ public:
 
     Request(const std::string& request_text, std::string ip);
     bool is_valid();
+    void print();
+    Request* no_print();
 private:
     bool valid;
+    bool allow_print;
 
-    void print();
     std::string get_time();
 };

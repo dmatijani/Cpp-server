@@ -31,12 +31,14 @@ int main(int argc, char *argv[]) {
     server = new Server("127.0.0.1", port);
 
     server->get("/js", [](Request* req, Response* res) {
+        req->no_print();
         std::string file_text = File::fileFromPath("./client/js/app.js");
-        res->set_content_type("application/javascript")->set_status(200)->set_data(file_text);
+        res->set_content_type("application/javascript")->set_status(200)->no_print()->set_data(file_text);
     });
     server->get("/css", [](Request* req, Response* res) {
+        req->no_print();
         std::string file_text = File::fileFromPath("./client/styles/style.css");
-        res->set_content_type("text/css")->set_status(200)->set_data(file_text);
+        res->set_content_type("text/css")->set_status(200)->no_print()->set_data(file_text);
     });
 
     server->get("/", [](Request* req, Response* res) {
@@ -66,9 +68,9 @@ int main(int argc, char *argv[]) {
     });
     server->post("/novaObjava", [](Request* req, Response* res) {
         std::string template_text = File::fileFromPath("./client/template.html");
-        std::string post_text = "<p>Poslao si formu uspješno!</p>";
+        std::string new_post_text = File::fileFromPath("./client/nova_objava.html");
         Html* html = new Html(template_text);
-        html->set_title("Nova objava")->set_content(post_text);
+        html->set_title("Prebacujem...")->set_content(new_post_text);
         res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
         delete html;
     });
