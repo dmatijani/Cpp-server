@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     pageButtons();
+    commentForm();
 });
 
 function pageButtons() {
@@ -24,6 +25,32 @@ function pageButtons() {
     if (pageCount != undefined) {
         pageCount.innerHTML = `Stranica ${getPage()}`;
     }
+}
+
+function commentForm() {
+    const commentForm = document.getElementById("commentForm");
+    if (commentForm == undefined) {
+        return;
+    }
+
+    commentForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(commentForm);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has("id")) {
+            return;
+        }
+
+        const response = await fetch(`/dodajKomentar?id=${urlParams.get("id")}`, {
+            method: commentForm.method,
+            body: formData
+        });
+
+        if (response.ok) {
+            window.location.href = window.location.href;
+        }
+    });
 }
 
 function getPage() {

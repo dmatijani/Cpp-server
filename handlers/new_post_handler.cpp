@@ -91,6 +91,6 @@ void NewPostHandler::handle_new_post(Request* req, Response* res) {
     std::string new_post_text = File::fileFromPath("./client/nova_objava.html");
     Html* html = new Html(template_text);
     html->set_title("Prebacujem...")->set_content(new_post_text);
-    res->set_status(200)->set_data(html->get_html());
+    res->set_status(201)->set_data(html->get_html());
     delete html;
 }
