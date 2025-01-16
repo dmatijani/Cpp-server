@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <mutex>
 
 class File {
 public:
@@ -13,6 +14,8 @@ public:
 
     template <typename T>
     static std::vector<T> read_from_binary_file(const std::string& path);
+private:
+    static std::mutex write_mutex;
 };
 
 #endif
@@ -21,6 +24,8 @@ public:
 
 template <typename T>
 void File::write_to_binary_file(const std::string& path, const T& data) {
+    std::lock_guard<std::mutex> lock(write_mutex);
+
     std::ofstream file(path, std::ios::binary | std::ios::app);
     if (!file) {
         std::cerr << "Ne mogu otvoriti datoteku za pisanje: " << path << std::endl;

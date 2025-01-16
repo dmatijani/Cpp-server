@@ -1,5 +1,5 @@
 struct Objava {
     char uuid[36];
-    char naslov [51];
-    char sadrzaj [201];
+    char naslov [80];
+    char sadrzaj [300];
 };
