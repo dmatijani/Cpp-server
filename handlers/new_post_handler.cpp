@@ -68,12 +68,21 @@ void NewPostHandler::handle_new_post(Request* req, Response* res) {
         return;
     }
 
+    auto author_iter = req->form_data.find("autor");
+    if (author_iter == req->form_data.end()) {
+        delete res;
+        res = Response::bad_request();
+        return;
+    }
+
     Objava objava;
     generate_uuid(objava.uuid);
     std::strncpy(objava.naslov, req->form_data["naslov"].c_str(), sizeof(objava.naslov) - 1);
     objava.naslov[sizeof(objava.naslov) - 1] = '\0';
     std::strncpy(objava.sadrzaj, req->form_data["sadrzaj"].c_str(), sizeof(objava.sadrzaj) - 1);
     objava.sadrzaj[sizeof(objava.sadrzaj) - 1] = '\0';
+    std::strncpy(objava.autor, req->form_data["autor"].c_str(), sizeof(objava.autor) - 1);
+    objava.autor[sizeof(objava.autor) - 1] = '\0';
     get_time(objava.vrijeme);
 
     File::write_to_binary_file("./data/objave.bin", objava);

@@ -17,6 +17,7 @@ std::string get_posts(int page_number) {
         Html* post_html = new Html(objava_template);
         post_html->set_placeholder("naslov", std::string(post.naslov));
         post_html->set_placeholder("vrijeme", std::string(post.vrijeme));
+        post_html->set_placeholder("autor", std::string(post.autor));
         post_html->set_placeholder("putanja", "/objava?id=" + std::string(post.uuid));
         posts_html += post_html->get_html();
         delete post_html;
@@ -35,6 +36,7 @@ std::string get_post(std::string uuid) {
             Html* post_html = new Html(objava_template);
             post_html->set_placeholder("naslov", std::string(post.naslov));
             post_html->set_placeholder("vrijeme", std::string(post.vrijeme));
+            post_html->set_placeholder("autor", std::string(post.autor));
             post_html->set_placeholder("sadrzaj", std::string(post.sadrzaj));
             std::string to_return = post_html->get_html();
             delete post_html;

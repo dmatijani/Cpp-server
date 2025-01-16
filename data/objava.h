@@ -3,4 +3,5 @@ struct Objava {
     char naslov [80];
     char sadrzaj [300];
     char vrijeme [30];
+    char autor [50];
 };
