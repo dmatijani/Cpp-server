@@ -9,38 +9,56 @@
 #define PAGE_SIZE 10
 #endif
 
-std::string add_posts(int page) {
+std::string get_posts(int page_number) {
     std::string posts_html = "";
-    std::vector<Objava> posts = File::read_from_binary_file<Objava>("./data/objave.bin", page*PAGE_SIZE, PAGE_SIZE);
+    std::vector<Objava> posts = File::read_from_binary_file<Objava>("./data/objave.bin", page_number*PAGE_SIZE, PAGE_SIZE);
     for (auto & post : posts) {
-        posts_html += "<div>"
-                      "<h3>" + std::string(post.naslov) + "</h3>"
-                      "<p>Objavljeno: " + std::string(post.vrijeme) + "</p>"
-                      "<a href='/objava?id=" + std::string(post.uuid) + "'>Detalji</a>"
-                      "</div>";
+        std::string objava_template = File::fileFromPath("./client/components/objava.html");
+        Html* post_html = new Html(objava_template);
+        post_html->set_placeholder("naslov", std::string(post.naslov));
+        post_html->set_placeholder("vrijeme", std::string(post.vrijeme));
+        post_html->set_placeholder("putanja", "/objava?id=" + std::string(post.uuid));
+        posts_html += post_html->get_html();
+        delete post_html;
     }
 
     return posts_html;
 }
 
-std::string add_arrows() {
-    return "<button id='prevPageButton'><</button><span id='pageCount'></span><button id='nextPageButton'>></button>";
+std::string get_arrows() {
+    return File::fileFromPath("./client/components/strelice.html");
 }
 
 void GetPostsHandler::handle_get_posts(Request* req, Response* res) {
-    int page = 0;
+    int page_number = 0;
     if (req->params.find("page") != req->params.end()) {
         try {
-            page = stoi(req->params["page"]);
+            page_number = stoi(req->params["page"]);
         } catch (...) {
-            page = 0;
+            page_number = 0;
         }
     }
 
     std::string template_text = File::fileFromPath("./client/template.html");
     std::string homepage_text = File::fileFromPath("./client/index.html");
-    homepage_text += add_posts(page);
-    homepage_text += add_arrows();
+    Html* html = new Html(template_text);
+    html->set_title("Početna")->set_content(homepage_text);
+    html->set_placeholder("posts", get_posts(page_number));
+    html->set_placeholder("strelice", get_arrows());
+    res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
+    delete html;
+}
+
+void GetPostsHandler::handle_get_post_details(Request* req, Response* res) {
+    std::string id = "";
+    if (req->params.find("id") == req->params.end()) {
+        
+    }
+
+    id = req->params["id"];
+
+    std::string template_text = File::fileFromPath("./client/template.html");
+    std::string homepage_text = File::fileFromPath("./client/index.html");
     Html* html = new Html(template_text);
     html->set_title("Početna")->set_content(homepage_text);
     res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());

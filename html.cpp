@@ -1,4 +1,5 @@
 #include "html.h"
+#include <iostream>
 
 Html::Html(std::string html_template) {
     this->html_template = html_template;
@@ -28,7 +29,7 @@ Html* Html::set_content(std::string content) {
 
 std::string Html::get_html() {
     std::string html = this->html_template;
-    
+
     for (auto const& placeholder : this->placeholders) {
         std::string placeholder_mark = "[[ " + placeholder.first + " ]]";
         size_t placeholder_start_pos = 0;
