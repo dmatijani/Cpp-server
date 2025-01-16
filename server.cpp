@@ -96,6 +96,9 @@ void Server::handleClient(int client_socket, std::string client_ip) {
 
     int bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
     if (bytes_received <= 0) {
+        if (bytes_received == -1) {
+            logError("Nemogućnost prihvaćanja podataka od klijenta");
+        }
         close(client_socket);
         return;
     }
