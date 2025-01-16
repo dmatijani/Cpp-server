@@ -44,12 +44,16 @@ int main(int argc, char *argv[]) {
         res->set_content_type("text/css")->set_status(200)->no_print()->set_data(file_text);
     });
     server->get("/autorSlika", [](Request* req, Response* res) {
-        std::string file_data = File::file_from_path("./client/assets/autor.jpeg");
-        std::cout << "AUTOR: " << file_data << std::endl;
+        std::string file_data = File::file_from_path("./client/assets/autor.jpg");
+        res->set_content_type("image/jpeg")->set_status(200)->set_data(file_data);
+    });
+    server->get("/pozadinaSlika", [](Request* req, Response* res) {
+        std::string file_data = File::file_from_path("./client/assets/pozadina.jpg");
         res->set_content_type("image/jpeg")->set_status(200)->set_data(file_data);
     });
 
     server->get("/", GetPostsHandler::handle_get_posts);
+    server->get("/index", GetPostsHandler::handle_get_posts);
     server->get("/objava", GetPostDetailsHandler::handle_get_post_details);
     server->get("/autor", [](Request* req, Response* res) {
         std::string template_text = File::file_from_path("./client/template.html");

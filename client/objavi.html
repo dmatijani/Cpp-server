@@ -1,17 +1,17 @@
-<form method="POST" action="/novaObjava">
-    <label for="naslov">
-        Naslov
-    </label>
-    <input type="text" name="naslov" id="naslov" placeholder="Naslov" maxlength="50">
-    <br>
-    <label for="sadrzaj">
-        Sadržaj
-    </label>
-    <textarea name="sadrzaj" id="sadrzaj" placeholder="Sadržaj" maxlength="200"></textarea>
-    <label for="autor">
-        Autor
-    </label>
-    <input type="text" name="autor" id="autorInput" placeholder="Autor" maxlength="40">
-    <br>
-    <button type="submit">Pošalji</button>
-</form>
+<div class="card">
+    <form method="POST" action="/novaObjava" class="novaObjavaForm">
+        <label for="naslov">
+            Naslov
+        </label>
+        <input type="text" name="naslov" id="naslov" placeholder="Naslov objave." maxlength="50">
+        <label for="sadrzaj">
+            Sadržaj
+        </label>
+        <textarea name="sadrzaj" id="sadrzaj" placeholder="Unesite sadržaj vaše nove objave." maxlength="200"></textarea>
+        <label for="autor">
+            Autor
+        </label>
+        <input type="text" name="autor" id="autorInput" placeholder="Autor" maxlength="40" title="Automatski se postavlja na zadnje uneseno ime.">
+        <button type="submit" title="Ovo će kreirati novu objavu.">Pošalji</button>
+    </form>
+</div>

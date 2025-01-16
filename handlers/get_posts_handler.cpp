@@ -6,7 +6,7 @@
 #include <iostream>
 
 #ifndef PAGE_SIZE
-#define PAGE_SIZE 10
+#define PAGE_SIZE 5
 #endif
 
 std::string get_posts(int page_number) {

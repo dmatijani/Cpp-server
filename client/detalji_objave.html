@@ -1,14 +1,19 @@
-<h2>[[ naslov ]]</h2>
-<p>Objavljeno: [[ vrijeme ]]</p>
-<p>Objavio: [[ autor ]]</p>
-<p>[[ sadrzaj ]]</p>
+<div class="card detalji_objave">
+    <h2>[[ naslov ]]</h2>
+    <p class="p_manji">Objavljeno: [[ vrijeme ]]</p>
+    <p class="p_manji">Objavio: [[ autor ]]</p>
+    <hr>
+    <p class="p_veci">[[ sadrzaj ]]</p>
+</div>
 
 <h3>Komentari</h3>
 [[ komentari ]]
 
 <h3>Ostavi svoj komentar</h3>
-<form id="commentForm" method="POST" action="/dodajKomentar">
-    <input type="text" name="komentar" id="komentar" placeholder="Upiši svoj komentar" maxlength="150">
-    <input type="text" name="autor" id="autorInput" placeholder="Autor" maxlength="40">
-    <button type="submit">Pošalji</button>
-</form>
+<div class="card komentar novi_komentar">
+    <form id="commentForm" method="POST" action="/dodajKomentar">
+        <input type="text" name="komentar" id="komentar" class="komentar_input" placeholder="Upiši svoj komentar na ovu objavu." maxlength="150">
+        <input type="text" name="autor" id="autorInput" placeholder="Autor" maxlength="40" title="Automatski se postavlja na zadnje uneseno ime.">
+        <button type="submit" title="Objavit će komentar na ovu objavu.">Pošalji</button>
+    </form>
+</div>
