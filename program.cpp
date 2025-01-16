@@ -1,7 +1,7 @@
-#include "server.h"
 #include "file.h"
 #include "html.h"
-#include "new_post_handler.h"
+#include "server/server.h"
+#include "handlers/new_post_handler.h"
 #include <csignal>
 #include <iostream>
 

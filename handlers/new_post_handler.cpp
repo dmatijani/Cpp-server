@@ -1,7 +1,7 @@
 #include "new_post_handler.h"
-#include "file.h"
-#include "html.h"
-#include "data/objava.h"
+#include "../file.h"
+#include "../html.h"
+#include "../data/objava.h"
 #include <cstring>
 #include <sstream>
 #include <iomanip>

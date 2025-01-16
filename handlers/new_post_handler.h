@@ -1,5 +1,5 @@
-#include "request.h"
-#include "response.h"
+#include "../server/request.h"
+#include "../server/response.h"
 
 class NewPostHandler {
 public:
