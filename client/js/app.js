@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     pageButtons();
     commentForm();
+    authorInput();
 });
 
 function pageButtons() {
@@ -53,6 +54,22 @@ function commentForm() {
         if (response.ok) {
             window.location.href = window.location.href;
         }
+    });
+}
+
+function authorInput() {
+    const authorInput = document.getElementById("autorInput");
+    if (authorInput == undefined) {
+        return;
+    }
+
+    let savedAuthor = localStorage.getItem("autor");
+    if (savedAuthor != null) {
+        authorInput.setAttribute("value", savedAuthor);
+    }
+
+    authorInput.addEventListener("input", (event) => {
+        localStorage.setItem("autor", event.target.value);
     });
 }
 
