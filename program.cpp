@@ -3,6 +3,7 @@
 #include "server/server.h"
 #include "handlers/new_post_handler.h"
 #include "handlers/get_posts_handler.h"
+#include "handlers/new_comment_handler.h"
 #include <csignal>
 #include <iostream>
 
@@ -61,6 +62,7 @@ int main(int argc, char *argv[]) {
         delete html;
     });
     server->post("/novaObjava", NewPostHandler::handle_new_post);
+    server->post("/dodajKomentar", NewCommentHandler::handle_new_comment);
 
     server->run();
 

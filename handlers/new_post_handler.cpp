@@ -8,8 +8,6 @@
 #include <random>
 #include <chrono>
 
-#include <iostream>
-
 void get_time(char out[30])
 {
     time_t sad = time(0);
