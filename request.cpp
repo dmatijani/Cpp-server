@@ -2,9 +2,12 @@
 #include <iostream>
 #include <sstream>
 
-Request::Request(const std::string& request_text) {
-    this->content_type = "";
+Request::Request(const std::string& request_text, std::string ip) {
     this->valid = true;
+
+    this->content_type = "";
+    this->request_time = get_time();
+    this->client_ip = ip;
 
     size_t start = request_text.find(" ");
     if (start == std::string::npos) {
@@ -82,13 +85,14 @@ Request::Request(const std::string& request_text) {
 }
 
 void Request::print() {
-    std::cout << "METHOD: " << this->method << std::endl;
-    std::cout << "PATH: " << this->path << std::endl;
-    if (this->content_type != "") std::cout << "CONTENT-TYPE: " << this->content_type << std::endl;
-    if (this->data != "") std::cout << "DATA: " << this->data << std::endl;
+    std::cout << "(" << this->request_time << ") " << "ZAHTJEV DOŠAO SA: " << this->client_ip << std::endl;
+    std::cout << "(" << this->request_time << ") " <<  "METHOD: " << this->method << std::endl;
+    std::cout << "(" << this->request_time << ") " <<  "PATH: " << this->path << std::endl;
+    if (this->content_type != "") std::cout << "(" << this->request_time << ") " <<  "CONTENT-TYPE: " << this->content_type << std::endl;
+    if (this->data != "") std::cout << "(" << this->request_time << ") " <<  "DATA: " << this->data << std::endl;
 
     if (!this->accept.empty()) {
-        std::cout << "ACCEPT: ";
+        std::cout << "(" << this->request_time << ") " <<  "ACCEPT: ";
         for (const auto& mime : this->accept) {
             std::cout << mime << " ";
         }
@@ -96,14 +100,14 @@ void Request::print() {
     }
 
     if (!this->params.empty()) {
-        std::cout << "PARAMS:" << std::endl;
+        std::cout << "(" << this->request_time << ") " <<  "PARAMS:" << std::endl;
         for (const auto& [key, value] : this->params) {
             std::cout << "  " << key << ": " << value << std::endl;
         }
     }
 
     if (!this->form_data.empty()) {
-        std::cout << "FORM DATA:" << std::endl;
+        std::cout << "(" << this->request_time << ") " <<  "FORM DATA:" << std::endl;
         for (const auto& [key, value] : this->form_data) {
             std::cout << " -" << key << ": " << value << std::endl;
         }
@@ -115,4 +119,22 @@ void Request::print() {
 
 bool Request::is_valid() {
     return this->valid;
+}
+
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+
+std::string Request::get_time() {
+    auto now = std::chrono::system_clock::now();
+    
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
+        now.time_since_epoch()) % 1000;
+
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&in_time_t), "%H:%M:%S")
+        << "." << std::setw(3) << std::setfill('0') << milliseconds.count();
+    
+    return oss.str();
 }

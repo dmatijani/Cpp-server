@@ -25,7 +25,7 @@ private:
 
     void startServer();
     void stopServer();
-    void handleClient(int client_socket);
-    std::string processRequest(const std::string& request);
+    void handleClient(int client_socket, std::string client_ip);
+    std::string processRequest(const std::string& request, std::string client_ip);
     void joinThreads();
 };

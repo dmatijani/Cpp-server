@@ -76,8 +76,9 @@ void Server::run() {
             continue;
         }
 
-        log("Klijent se povezao");
-        threads.emplace_back(&Server::handleClient, this, client_socket);
+        std::string client_ip = inet_ntoa(client_addr.sin_addr);
+
+        threads.emplace_back(&Server::handleClient, this, client_socket, client_ip);
     }
 }
 
@@ -89,7 +90,7 @@ void Server::post(std::string path, void(*callback)(Request*, Response*)) {
     handlers["POST"].insert(std::make_pair(path, callback));
 }
 
-void Server::handleClient(int client_socket) {
+void Server::handleClient(int client_socket, std::string client_ip) {
     char buffer[1024];
     memset(buffer, 0, sizeof(buffer));
 
@@ -101,17 +102,14 @@ void Server::handleClient(int client_socket) {
     }
 
     std::string request(buffer);
-    std::string response = processRequest(request);
+    std::string response = processRequest(request, client_ip);
 
     send(client_socket, response.c_str(), response.size(), 0);
     close(client_socket);
 }
 
-std::string Server::processRequest(const std::string& request_text) {
-    std::string bad_request = "HTTP/1.1 400 Bad Request\r\n"
-                              "Content-Type: text/plain\r\n\r\n"
-                              "Invalid request.";
-    Request* request = new Request(request_text);
+std::string Server::processRequest(const std::string& request_text, std::string client_ip) {
+    Request* request = new Request(request_text, client_ip);
     if (!request->is_valid()) {
         delete request;
         return Response::bad_request_text();
