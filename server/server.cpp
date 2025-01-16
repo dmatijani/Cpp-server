@@ -9,14 +9,6 @@
 #include <vector>
 #include <fstream>
 
-void log(const std::string &message) {
-    std::cout << message << std::endl;
-}
-
-void logError(const std::string &errorMessage) {
-    log("ERROR: " + errorMessage);
-}
-
 Server::Server(const std::string& ip_addr, int port)
     : ip_address(ip_addr), port(port), server_socket(-1) {
     startServer();
@@ -30,13 +22,13 @@ Server::~Server() {
 void Server::startServer() {
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket < 0) {
-        logError("Ne mogu kreirati socket");
+        std::cerr << "Ne mogu kreirati socket" << std::endl;
         exit(1);
     }
 
     int opt = 1;
     if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-        logError("Ne mogu postaviti opciju SO_REUSEADDR");
+        std::cerr << "Ne mogu postaviti opciju SO_REUSEADDR" << std::endl;
         exit(1);
     }
 
@@ -45,24 +37,24 @@ void Server::startServer() {
     server_addr.sin_port = htons(port);
 
     if (bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        logError("Ne mogu povezati socket");
+        std::cerr << "Ne mogu povezati socket" << std::endl;
         exit(1);
     }
 
     if (listen(server_socket, 5) < 0) {
-        logError("Ne mogu slušati na socketu");
+        std::cerr << "Ne mogu slušati na socketu" << std::endl;
         exit(1);
     }
 
-    log("Server pokrenut na " + ip_address + ":" + std::to_string(port));
+    std::cout << "Server pokrenut na " << ip_address << ":" << port << std::endl << std::endl;
 }
 
 void Server::stopServer() {
     if (server_socket >= 0) {
         close(server_socket);
-        log("Socket zatvoren");
+        std::cout << "Socket zatvoren" << std::endl;
     }
-    log("Server uspješno ugašen");
+    std::cout << "Server uspješno ugašen" << std::endl;
 }
 
 void Server::run() {
@@ -72,7 +64,7 @@ void Server::run() {
 
         int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_len);
         if (client_socket < 0) {
-            logError("Klijent se ne može povezati");
+            std::cerr << "Klijent se ne može povezati" << std::endl;
             continue;
         }
 
@@ -91,13 +83,13 @@ void Server::post(std::string path, void(*callback)(Request*, Response*)) {
 }
 
 void Server::handleClient(int client_socket, std::string client_ip) {
-    char buffer[1024];
+    char buffer[2048];
     memset(buffer, 0, sizeof(buffer));
 
     int bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
     if (bytes_received <= 0) {
         if (bytes_received == -1) {
-            logError("Nemogućnost prihvaćanja podataka od klijenta");
+            std::cerr << "Nemogućnost prihvaćanja podataka od klijenta" << std::endl;
         }
         close(client_socket);
         return;
@@ -146,12 +138,12 @@ std::string Server::processRequest(const std::string& request_text, std::string 
 }
 
 void Server::joinThreads() {
+    std::cout << "Joinam dretve" << std::endl;
     for (std::thread& t : threads) {
         if (t.joinable()) {
             t.join();
-            log("Dretva je joinana");
         } else {
-            log("Dretva se ne može joinati");
+            std::cerr << "Dretva " << t.get_id() << " se ne može joinati" << std::endl;
         }
     }
     threads.clear();
