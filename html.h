@@ -6,7 +6,7 @@
 
 class Html {
 public:
-    Html(std::string html_template);
+    Html(std::string html_template = "[[ content ]]");
     Html* set_template(std::string html_template);
     Html* set_placeholder(std::string placeholder, std::string content);
     Html* set_title(std::string title);
