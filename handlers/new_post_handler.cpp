@@ -1,24 +1,12 @@
 #include "new_post_handler.h"
 #include "../file.h"
 #include "../html.h"
+#include "../time.h"
 #include "../data/objava.h"
 #include <cstring>
 #include <sstream>
 #include <iomanip>
 #include <random>
-#include <chrono>
-
-void get_time(char out[30])
-{
-    time_t sad = time(0);
-    tm *ltm = localtime(&sad);
-    char buffer[80];
-    strftime(buffer, sizeof(buffer), "%d.%m.%Y %H:%M:%S", ltm);
-    std::string time_str = std::string(buffer);
-    for (int i = 0; i < 30; i++) {
-        out[i] = time_str[i];
-    }
-}
 
 void generate_uuid(char out[36]) {
     std::random_device rd;
@@ -81,7 +69,7 @@ void NewPostHandler::handle_new_post(Request* req, Response* res) {
     objava.sadrzaj[sizeof(objava.sadrzaj) - 1] = '\0';
     std::strncpy(objava.autor, req->form_data["autor"].c_str(), sizeof(objava.autor) - 1);
     objava.autor[sizeof(objava.autor) - 1] = '\0';
-    get_time(objava.vrijeme);
+    Time::get_time(objava.vrijeme);
 
     File::write_to_binary_file("./data/objave.bin", objava);
 

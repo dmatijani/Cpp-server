@@ -1,5 +1,6 @@
 #include "new_comment_handler.h"
 #include "../file.h"
+#include "../time.h"
 #include "../data/komentar.h"
 #include <cstring>
 
@@ -43,6 +44,7 @@ void NewCommentHandler::handle_new_comment(Request* req, Response* res) {
     komentar.komentar[sizeof(komentar.komentar) - 1] = '\0';
     std::strncpy(komentar.autor, req->form_data["autor"].c_str(), sizeof(komentar.autor) - 1);
     komentar.autor[sizeof(komentar.autor) - 1] = '\0';
+    Time::get_time(komentar.vrijeme);
 
     File::write_to_binary_file("./data/" + post_id + ".bin", komentar);
 
