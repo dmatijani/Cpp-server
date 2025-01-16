@@ -1,3 +1,6 @@
+#ifndef HTML_H
+#define HTML_H
+
 #include <string>
 
 class Html {
@@ -12,3 +15,5 @@ private:
     std::string title;
     std::string content;
 };
+
+#endif

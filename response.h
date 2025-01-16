@@ -1,3 +1,6 @@
+#ifndef RESPONSE_H
+#define RESPONSE_H
+
 #include <string>
 
 class Response {
@@ -25,3 +28,5 @@ private:
 
     std::string get_status_code_text();
 };
+
+#endif

@@ -1,6 +1,7 @@
 #include "server.h"
 #include "file.h"
 #include "html.h"
+#include "new_post_handler.h"
 #include <csignal>
 #include <iostream>
 
@@ -65,15 +66,8 @@ int main(int argc, char *argv[]) {
         res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
         delete html;
     });
-    server->post("/novaObjava", [](Request* req, Response* res) {
-        std::string template_text = File::fileFromPath("./client/template.html");
-        std::string new_post_text = File::fileFromPath("./client/nova_objava.html");
-        Html* html = new Html(template_text);
-        html->set_title("Prebacujem...")->set_content(new_post_text);
-        res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
-        delete html;
-    });
-    
+    server->post("/novaObjava", NewPostHandler::handle_new_post);
+
     server->run();
 
     end(0);

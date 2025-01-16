@@ -5,6 +5,27 @@
 #include <iomanip>
 #include <sstream>
 
+std::string url_decode(std::string str){ // 5. komentar na https://stackoverflow.com/questions/154536/encode-decode-urls-in-c
+    std::string ret;
+    char ch;
+    int i, ii, len = str.length();
+
+    for (i=0; i < len; i++){
+        if(str[i] != '%'){
+            if(str[i] == '+')
+                ret += ' ';
+            else
+                ret += str[i];
+        }else{
+            sscanf(str.substr(i + 1, 2).c_str(), "%x", &ii);
+            ch = static_cast<char>(ii);
+            ret += ch;
+            i = i + 2;
+        }
+    }
+    return ret;
+}
+
 Request::Request(const std::string& request_text, std::string ip) {
     this->valid = true;
     this->allow_print = true;
@@ -78,7 +99,7 @@ Request::Request(const std::string& request_text, std::string ip) {
                 size_t equal_pos = data.find("=");
                 if (equal_pos != std::string::npos) {
                     std::string key = data.substr(0, equal_pos);
-                    std::string value = data.substr(equal_pos + 1);
+                    std::string value = url_decode(data.substr(equal_pos + 1));
                     form_data[key] = value;
                 }
             }

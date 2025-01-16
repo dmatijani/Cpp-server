@@ -1,3 +1,6 @@
+#ifndef REQUEST_H
+#define REQUEST_H
+
 #include <string>
 #include <vector>
 #include <map>
@@ -24,3 +27,5 @@ private:
 
     std::string get_time();
 };
+
+#endif
