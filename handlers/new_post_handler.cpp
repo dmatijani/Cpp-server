@@ -4,31 +4,35 @@
 #include "../time.h"
 #include "../data/objava.h"
 #include <cstring>
-#include <sstream>
-#include <iomanip>
-#include <random>
 
-void generate_uuid(char out[36]) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 15);
-
-    std::stringstream ss;
-    ss << std::hex << std::setw(8) << std::setfill('0') << dis(gen) << dis(gen) << dis(gen) << dis(gen);
-    ss << '-';
-    ss << std::setw(4) << std::setfill('0') << dis(gen) << dis(gen);
-    ss << '-';
-    ss << std::setw(4) << std::setfill('0') << dis(gen) << dis(gen);
-    ss << '-';
-    ss << std::setw(4) << std::setfill('0') << dis(gen) << dis(gen);
-    ss << '-';
-    ss << std::setw(12) << std::setfill('0') << dis(gen) << dis(gen) << dis(gen) << dis(gen);
-
-    std::string uuid_str = ss.str();
-    for (int i = 0; i < 35; i++) {
-        out[i] = uuid_str[i];
+char get_random_char() {
+    if (rand() % 2 == 0) {
+        return 'A' + rand() % ('Z' - 'A');
+    } else {
+        return 'a' + rand() % ('z' - 'a');
     }
-    out[35] = '\0';
+}
+
+void generate_uuid(char out[50]) {
+    char time[30];
+    Time::get_time(time);
+    bool insert_time = true;
+    for (int i = 0; i < 49; i++) {
+        if (insert_time) {
+            char time_char = time[i];
+            if (time_char == '\0' || time_char < '0' || time_char > '9') {
+                if (time_char == '\0') {
+                    insert_time = false;
+                }
+                out[i] = get_random_char();
+            } else {
+                out[i] = time_char;
+            }
+        } else {
+            out[i] = get_random_char();
+        }
+    }
+    out[49] = '\0';
 }
 
 void NewPostHandler::handle_new_post(Request* req, Response* res) {
