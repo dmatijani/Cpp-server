@@ -35,7 +35,7 @@ function commentForm() {
 
     commentForm.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const formData = new FormData(commentForm);
+        const formData = new URLSearchParams(new FormData(commentForm));
 
         const urlParams = new URLSearchParams(window.location.search);
         if (!urlParams.has("id")) {
@@ -44,7 +44,10 @@ function commentForm() {
 
         const response = await fetch(`/dodajKomentar?id=${urlParams.get("id")}`, {
             method: commentForm.method,
-            body: formData
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
         });
 
         if (response.ok) {
