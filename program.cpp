@@ -2,6 +2,7 @@
 #include "html.h"
 #include "server/server.h"
 #include "handlers/new_post_handler.h"
+#include "handlers/get_posts_handler.h"
 #include <csignal>
 #include <iostream>
 
@@ -41,15 +42,7 @@ int main(int argc, char *argv[]) {
         res->set_content_type("text/css")->set_status(200)->no_print()->set_data(file_text);
     });
 
-    server->get("/", [](Request* req, Response* res) {
-        std::string template_text = File::fileFromPath("./client/template.html");
-        std::string homepage_text = File::fileFromPath("./client/index.html");
-        homepage_text += "<p>Ovo je početna stranica!</p>";
-        Html* html = new Html(template_text);
-        html->set_title("Početna")->set_content(homepage_text);
-        res->set_content_type("text/html")->set_status(200)->set_data(html->get_html());
-        delete html;
-    });
+    server->get("/", GetPostsHandler::handle_get_posts);
     server->get("/autor", [](Request* req, Response* res) {
         std::string template_text = File::fileFromPath("./client/template.html");
         std::string author_text = File::fileFromPath("./client/autor.html");

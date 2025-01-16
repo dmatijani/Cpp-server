@@ -50,7 +50,7 @@ std::vector<T> File::read_from_binary_file(const std::string& path, int start, i
     std::vector<T> data;
     T temp;
 
-    while (file.read(reinterpret_cast<char*>(&temp), sizeof(T)) && (count > 0)) {
+    while (file.read(reinterpret_cast<char*>(&temp), sizeof(T)) && (count != 0)) {
         data.push_back(temp);
         count--;
     }
