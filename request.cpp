@@ -3,8 +3,7 @@
 #include <sstream>
 
 Request::Request(const std::string& request_text) {
-    std::cout << request_text << std::endl;
-
+    this->content_type = "";
     this->valid = true;
 
     size_t start = request_text.find(" ");
@@ -25,6 +24,10 @@ Request::Request(const std::string& request_text) {
     size_t accept_start = request_text.find("Accept: ");
     if (accept_start != std::string::npos) {
         size_t accept_end = request_text.find("\r\n", accept_start);
+        size_t accept_end_smaller = request_text.find(";q=", accept_start);
+        if (accept_end_smaller != std::string::npos && accept_end_smaller < accept_end && accept_end_smaller > accept_start) {
+            accept_end = accept_end_smaller;
+        }
         std::string accept_value = request_text.substr(accept_start + 8, accept_end - accept_start - 8);
 
         std::stringstream ss(accept_value);
@@ -32,6 +35,12 @@ Request::Request(const std::string& request_text) {
         while (std::getline(ss, mime_type, ',')) {
             accept.push_back(mime_type);
         }
+    }
+
+    size_t content_type_start = request_text.find("Content-Type: ");
+    if (content_type_start != std::string::npos) {
+        size_t content_type_end = request_text.find("\r\n", content_type_start);
+        this->content_type = request_text.substr(content_type_start + 14, content_type_end - content_type_start - 14);
     }
 
     size_t query_start = this->path.find("?");
@@ -51,7 +60,58 @@ Request::Request(const std::string& request_text) {
 
         this->path = this->path.substr(0, query_start);
     }
+
+    size_t data_start = request_text.find("\r\n\r\n");
+    if (data_start != std::string::npos) {
+        this->data = request_text.substr(data_start + 4);
+        if (this->content_type == "application/x-www-form-urlencoded") {
+            std::stringstream ss(this->data);
+            std::string data;
+            while (std::getline(ss, data, '&')) {
+                size_t equal_pos = data.find("=");
+                if (equal_pos != std::string::npos) {
+                    std::string key = data.substr(0, equal_pos);
+                    std::string value = data.substr(equal_pos + 1);
+                    form_data[key] = value;
+                }
+            }
+        }
+    }
+
+    this->print();
 }
+
+void Request::print() {
+    std::cout << "METHOD: " << this->method << std::endl;
+    std::cout << "PATH: " << this->path << std::endl;
+    if (this->content_type != "") std::cout << "CONTENT-TYPE: " << this->content_type << std::endl;
+    if (this->data != "") std::cout << "DATA: " << this->data << std::endl;
+
+    if (!this->accept.empty()) {
+        std::cout << "ACCEPT: ";
+        for (const auto& mime : this->accept) {
+            std::cout << mime << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    if (!this->params.empty()) {
+        std::cout << "PARAMS:" << std::endl;
+        for (const auto& [key, value] : this->params) {
+            std::cout << "  " << key << ": " << value << std::endl;
+        }
+    }
+
+    if (!this->form_data.empty()) {
+        std::cout << "FORM DATA:" << std::endl;
+        for (const auto& [key, value] : this->form_data) {
+            std::cout << " -" << key << ": " << value << std::endl;
+        }
+    }
+
+    std::cout << "------------------------------" << std::endl;
+}
+
 
 bool Request::is_valid() {
     return this->valid;
