@@ -8,7 +8,6 @@
 
 void NewCommentHandler::handle_new_comment(Request* req, Response* res) {
     res->set_content_type("text/html");
-    std::cout << "Došao sam ovdje" << std::endl;
 
     if (req->form_data.size() == 0) {
         delete res;
